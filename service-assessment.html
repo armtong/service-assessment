@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>服务流程评估问卷</title>
+<style>
+:root{
+  --bg:#f4f5f7; --panel:#ffffff; --ink:#1f2937; --ink2:#374151; --muted:#6b7280;
+  --line:#e2e5e9; --line2:#eef0f2;
+  --accent:#2f6f8f; --accent-d:#255a75; --accent-w:#eaf1f5;
+  --bad:#b4534b; --bad-w:#fbf2f1;
+  --mid:#a8802f; --mid-w:#fbf6ec;
+  --good:#4a7c59; --good-w:#eff5f0;
+  --radius:6px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font:14px/1.62 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  -webkit-text-size-adjust:100%;
+}
+h1,h2,h3,h4{margin:0;font-weight:600}
+p{margin:0}
+a{color:var(--accent)}
+
+/* ---------- 顶栏 ---------- */
+.topbar{
+  position:sticky;top:0;z-index:30;background:var(--panel);
+  border-bottom:1px solid var(--line);
+  padding:10px 18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+}
+.brand{display:flex;align-items:baseline;gap:8px;font-size:15px;font-weight:600;letter-spacing:.2px}
+.brand .sub{font-size:11.5px;font-weight:400;color:var(--muted)}
+.tabs{display:flex;gap:2px;margin-left:auto;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{
+  border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px;
+  padding:6px 12px;border-radius:4px;cursor:pointer;white-space:nowrap;
+}
+.tab:hover{background:var(--line2);color:var(--ink2)}
+.tab.active{background:var(--accent-w);color:var(--accent);font-weight:600}
+
+/* ---------- 布局 ---------- */
+main{max-width:1120px;margin:0 auto;padding:16px 18px 110px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.card-h h2{font-size:14px;letter-spacing:.2px}
+.card-h .hint{font-size:12px;color:var(--muted)}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.hidden{display:none !important}
+
+/* ---------- 表单控件 ---------- */
+label.f{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+input[type=text],input[type=url],input[type=password],input[type=datetime-local],select,textarea{
+  width:100%;font:inherit;font-size:13.5px;color:var(--ink);background:#fff;
+  border:1px solid var(--line);border-radius:4px;padding:8px 10px;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-w)}
+textarea{resize:vertical;line-height:1.55}
+.field-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.field.err input,.field.err select{border-color:var(--bad);background:var(--bad-w)}
+.field .e-msg{display:none;font-size:11.5px;color:var(--bad);margin-top:4px}
+.field.err .e-msg{display:block}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  font:inherit;font-size:13px;padding:8px 14px;border-radius:4px;cursor:pointer;
+  border:1px solid var(--line);background:#fff;color:var(--ink2);white-space:nowrap;
+}
+.btn:hover{border-color:#cfd5db;background:#fafbfc}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-d);border-color:var(--accent-d)}
+.btn.danger{color:var(--bad);border-color:#e8d3d0}
+.btn.danger:hover{background:var(--bad-w)}
+.btn.sm{padding:5px 10px;font-size:12px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* ---------- 步骤 / 评估项 ---------- */
+.step{margin-bottom:18px}
+.step-h{
+  display:flex;align-items:center;gap:10px;margin:0 0 10px;
+  padding-bottom:8px;border-bottom:1px solid var(--line);
+}
+.step-h .idx{
+  width:22px;height:22px;flex:0 0 22px;border-radius:4px;background:var(--accent-w);color:var(--accent);
+  font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;
+}
+.step-h h3{font-size:14px}
+.step-h .step-sum{margin-left:auto;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.step-h .step-sum b{color:var(--accent);font-weight:600}
+
+.item{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:12px 14px;margin-bottom:10px;
+}
+.item.invalid{border-color:var(--bad);box-shadow:inset 3px 0 0 var(--bad)}
+.item-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.item-h .t{font-size:13.5px;font-weight:600;color:var(--ink)}
+.item-h .badge{
+  margin-left:auto;font-size:11px;color:var(--muted);border:1px solid var(--line);
+  border-radius:10px;padding:1px 8px;white-space:nowrap;
+}
+.opts{display:flex;gap:8px;margin:10px 0 8px;flex-wrap:wrap}
+.opt{
+  flex:1 1 130px;display:flex;flex-direction:column;gap:1px;align-items:flex-start;
+  padding:7px 11px;border:1px solid var(--line);border-radius:4px;background:#fff;
+  font:inherit;font-size:13px;color:var(--ink2);cursor:pointer;text-align:left;transition:.12s;
+}
+.opt i{font-style:normal;font-size:11px;color:var(--muted)}
+.opt:hover{border-color:#cfd5db;background:#fafbfc}
+.opt[data-level="不合格"].sel{border-color:var(--bad);background:var(--bad-w);color:#8e3f38;font-weight:600}
+.opt[data-level="合格"].sel{border-color:var(--mid);background:var(--mid-w);color:#7f5f1f;font-weight:600}
+.opt[data-level="优秀"].sel{border-color:var(--good);background:var(--good-w);color:#3a6347;font-weight:600}
+.opt.sel i{color:inherit;opacity:.75}
+.beh{
+  font-size:12.5px;color:var(--muted);background:#fafbfc;border-left:2px solid var(--line);
+  padding:4px 0 4px 9px;margin:0 0 8px;display:none;
+}
+.beh.on{display:block}
+.reason-l{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted);margin-bottom:4px}
+.req{font-size:11px;color:var(--bad)}
+textarea.rt{min-height:44px}
+textarea.invalid{border-color:var(--bad);background:var(--bad-w)}
+
+/* ---------- 底部实时条 ---------- */
+.fillbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--panel);
+  border-top:1px solid var(--line);padding:10px 18px calc(10px + env(safe-area-inset-bottom));
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  box-shadow:0 -2px 10px rgba(16,24,40,.05);
+}
+.fillbar .fb{display:flex;align-items:baseline;gap:6px;font-size:12.5px;color:var(--muted);white-space:nowrap}
+.fillbar .fb b{font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums;font-weight:600}
+.fillbar .fb b.acc{color:var(--accent)}
+.fillbar .grow{margin-left:auto}
+.pbar{height:4px;background:var(--line2);border-radius:2px;overflow:hidden;flex:1 1 160px;max-width:320px}
+.pbar>span{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+
+/* ---------- 结果 ---------- */
+.result-grid{display:grid;grid-template-columns:270px minmax(0,1fr);gap:14px;align-items:start}
+.rec-list{padding:8px}
+.rec-list .rl-h{font-size:12px;color:var(--muted);padding:6px 8px 8px;display:flex;justify-content:space-between}
+.rec{
+  width:100%;text-align:left;border:1px solid transparent;background:transparent;border-radius:4px;
+  padding:8px 10px;cursor:pointer;font:inherit;display:block;
+}
+.rec:hover{background:#fafbfc}
+.rec.active{background:var(--accent-w);border-color:#cfe0e9}
+.rec .r1{display:flex;justify-content:space-between;gap:8px;font-size:13px;font-weight:600;color:var(--ink)}
+.rec .r1 span:last-child{color:var(--accent);font-variant-numeric:tabular-nums}
+.rec .r2{font-size:11.5px;color:var(--muted);margin-top:2px}
+.rec.static{cursor:default}
+.rec.static:hover{background:transparent}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.kpi{border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;background:#fcfcfd}
+.kpi .k{font-size:11.5px;color:var(--muted)}
+.kpi .v{font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:2px}
+.kpi .v small{font-size:12px;color:var(--muted);font-weight:400;margin-left:2px}
+
+.bar-row{display:grid;grid-template-columns:120px 1fr 86px;gap:10px;align-items:center;margin-bottom:8px;font-size:12.5px}
+.bar-row .bl{color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{height:8px;background:var(--line2);border-radius:4px;overflow:hidden}
+.bar>span{display:block;height:100%;background:var(--accent);border-radius:4px}
+.bar-val{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{border-bottom:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:#fafbfc;color:var(--ink2);font-weight:600;white-space:nowrap;border-bottom-color:#dde1e6}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.sc{font-weight:600;white-space:nowrap}
+
+.chip{display:inline-block;font-size:11.5px;padding:1px 8px;border-radius:10px;border:1px solid;white-space:nowrap}
+.chip-不合格{color:#8e3f38;border-color:#dcb8b3;background:var(--bad-w)}
+.chip-合格{color:#7f5f1f;border-color:#ddc9a2;background:var(--mid-w)}
+.chip-优秀{color:#3a6347;border-color:#b8cdbf;background:var(--good-w)}
+.chip-未评{color:var(--muted);border-color:var(--line);background:#fafbfc}
+
+details.mi{border:1px solid var(--line);border-radius:var(--radius);margin-bottom:10px;background:var(--panel)}
+details.mi>summary{
+  cursor:pointer;padding:9px 12px;font-size:13px;font-weight:600;color:var(--ink2);
+  display:flex;align-items:center;gap:8px;list-style:none;
+}
+details.mi>summary::-webkit-details-marker{display:none}
+details.mi>summary .caret{color:var(--muted);font-size:11px;transition:.15s;transform:rotate(-90deg)}
+details.mi[open]>summary .caret{transform:rotate(0)}
+details.mi>summary .sum-r{margin-left:auto;font-weight:400;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+details.mi .body{padding:0 12px 12px}
+
+.empty{text-align:center;color:var(--muted);padding:34px 16px;font-size:13px}
+.empty b{display:block;color:var(--ink2);font-size:14px;margin-bottom:6px}
+
+/* ---------- 共享 / 设置 ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.mono{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.5;
+  word-break:break-all;
+}
+.code-box{height:132px;resize:vertical}
+pre.sql{
+  background:#fafbfc;border:1px solid var(--line);border-radius:4px;padding:10px 12px;
+  font-size:11.5px;line-height:1.6;overflow:auto;max-height:240px;color:var(--ink2);
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;margin:8px 0 0;
+}
+.note{font-size:12px;color:var(--muted);line-height:1.7}
+.note b{color:var(--ink2)}
+hr.sep{border:0;border-top:1px solid var(--line2);margin:14px 0}
+
+/* ---------- Toast ---------- */
+#toast{
+  position:fixed;left:50%;bottom:78px;transform:translateX(-50%) translateY(8px);
+  background:#1f2937;color:#fff;font-size:12.5px;padding:9px 16px;border-radius:4px;
+  opacity:0;pointer-events:none;transition:.2s;z-index:60;max-width:88vw;text-align:center;
+}
+#toast.on{opacity:.96;transform:translateX(-50%) translateY(0)}
+
+/* ---------- 移动端 ---------- */
+@media (max-width:860px){
+  .result-grid{grid-template-columns:1fr}
+  .split{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:720px){
+  main{padding:12px 12px 150px}
+  .topbar{padding:8px 12px;gap:8px}
+  .brand .sub{display:none}
+  .tabs{margin-left:0;width:100%}
+  .field-grid{grid-template-columns:1fr}
+  .card{padding:12px}
+  .opt{flex:1 1 100%}
+  .bar-row{grid-template-columns:92px 1fr 76px;font-size:12px}
+  .fillbar{gap:10px;padding:8px 12px calc(8px + env(safe-area-inset-bottom))}
+  .fillbar .fb b{font-size:15px}
+  .pbar{max-width:none;order:3;flex-basis:100%}
+  .fillbar .grow{margin-left:0}
+  .kpi .v{font-size:17px}
+}
+@media print{
+  .topbar,.fillbar,#toast,.no-print{display:none !important}
+  body{background:#fff}
+  main{padding:0;max-width:none}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">服务流程评估问卷<span class="sub" id="brandSub">26 个环节 · 满分 100 分</span></div>
+  <nav class="tabs">
+    <button class="tab active" data-view="fill">填写评估</button>
+    <button class="tab" data-view="result">汇总与明细</button>
+    <button class="tab" data-view="share">数据共享</button>
+    <button class="tab" data-view="settings">设置</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ================= 填写 ================= -->
+  <section id="view-fill">
+    <div class="card">
+      <div class="card-h">
+        <h2>基本信息</h2>
+        <span class="hint">被评估人与评估时间将随结果一并保存</span>
+      </div>
+      <div class="field-grid">
+        <div class="field" id="f-assessee">
+          <label class="f">被评估人姓名 <span style="color:#b4534b">*</span></label>
+          <input type="text" id="inAssessee" placeholder="如：张三" autocomplete="off">
+          <div class="e-msg">请填写被评估人姓名</div>
+        </div>
+        <div class="field" id="f-assessor">
+          <label class="f">评估人姓名 <span style="color:#b4534b">*</span></label>
+          <input type="text" id="inAssessor" placeholder="如：李店长" autocomplete="off">
+          <div class="e-msg">请填写评估人姓名</div>
+        </div>
+        <div class="field" id="f-time">
+          <label class="f">评估时间 <span style="color:#b4534b">*</span></label>
+          <input type="datetime-local" id="inTime">
+          <div class="e-msg">请选择评估时间</div>
+        </div>
+      </div>
+      <div class="small muted" style="margin-top:10px">
+        评分规则：每个环节按「不合格 / 合格 / 优秀」三级评定，按钮上标注对应分值；每条评分都必须填写打分原因。
+      </div>
+    </div>
+
+    <div id="formMsg"></div>
+    <div id="formRoot"></div>
+
+    <div class="card" style="position:static">
+      <div class="btn-row">
+        <button class="btn primary" id="btnSubmit">提交并查看汇总</button>
+        <button class="btn" id="btnReset">清空重填</button>
+        <span class="small muted">填写内容会自动暂存于本机，误关页面不会丢失。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 结果 ================= -->
+  <section id="view-result" class="hidden">
+    <div id="resultBody"></div>
+  </section>
+
+  <!-- ================= 共享 ================= -->
+  <section id="view-share" class="hidden">
+    <div class="card">
+      <div class="card-h">
+        <h2>导出结果（发给他人合用）</h2>
+        <span class="hint">无需服务器，对方粘贴即可并入同一看板</span>
+      </div>
+      <div class="btn-row" style="margin-bottom:10px">
+        <select id="shareSel" style="max-width:340px"></select>
+        <button class="btn" id="btnGenCode">生成结果码</button>
+        <button class="btn" id="btnCopyCode">复制结果码</button>
+        <button class="btn" id="btnDlJson">下载 JSON 文件</button>
+      </div>
+      <textarea class="mono code-box" id="codeOut" readonly placeholder="点击「生成结果码」后，此处出现可复制的结果码文本"></textarea>
+      <div class="note" style="margin-top:8px">
+        结果码为本次评估全部打分的压缩文本（不含参考行为原文，对方工具内已内置题表）。可微信/邮件发送，对方在下方导入即可查看。
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">
+        <h2>导入他人结果</h2>
+        <span class="hint">粘贴结果码或选择 JSON 文件，自动合并到本机看板</span>
+      </div>
+      <textarea class="mono" id="importText" placeholder="把对方发来的结果码粘贴到这里……" style="height:110px"></textarea>
+      <div class="btn-row" style="margin-top:10px">
+        <button class="btn primary" id="btnImportText">粘贴导入</button>
+        <button class="btn" id="btnPickFile">从文件导入</button>
+        <input type="file" id="fileInput" accept=".json,application/json,text/plain" class="hidden">
+      </div>
+      <hr class="sep">
+      <div class="note">
+        <b>批量收集建议：</b>每位评估人填完后点击「下载 JSON 文件」把结果发给你，你依次「从文件导入」，同一看板即可汇总全部人的结果与明细，再由「汇总与明细」页导出 CSV（Excel 可直接打开）。<br>
+        若已配置云端（设置页），提交时会自动上传，其他人打开同一 HTML 并在设置里填同样的地址与密钥，点击「从云端拉取」即可看到全部结果。
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 设置 ================= -->
+  <section id="view-settings" class="hidden">
+    <div class="card">
+      <div class="card-h">
+        <h2>云端同步（可选）</h2>
+        <span class="hint">留空则完全本地运行，数据不出本机</span>
+      </div>
+      <div class="field-grid" style="grid-template-columns:1fr 1fr">
+        <div class="field">
+          <label class="f">Supabase 项目 URL</label>
+          <input type="url" id="inSbUrl" placeholder="https://xxxx.supabase.co" autocomplete="off">
+        </div>
+        <div class="field">
+          <label class="f">anon public key</label>
+          <input type="password" id="inSbKey" placeholder="eyJhbGciOi..." autocomplete="off">
+        </div>
+      </div>
+      <div class="field-grid" style="grid-template-columns:1fr 1fr;margin-top:12px">
+        <div class="field">
+          <label class="f">数据表名</label>
+          <input type="text" id="inSbTable" placeholder="service_assessments" autocomplete="off">
+        </div>
+        <div class="field">
+          <label class="f">提交后自动上传</label>
+          <select id="inSbAuto">
+            <option value="1">开启</option>
+            <option value="0">关闭</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn primary" id="btnSaveSettings">保存设置</button>
+        <button class="btn" id="btnTestSb">测试连接</button>
+        <button class="btn" id="btnPullSb">从云端拉取</button>
+        <span class="small muted" id="sbState">未配置云端</span>
+      </div>
+      <hr class="sep">
+      <div class="note">
+        <b>使用步骤：</b>① 在 supabase.com 新建项目；② 打开 SQL Editor，执行下方建表语句；③ 把 Project URL 与 anon public key 填入上面并保存。<br>
+        同一份 HTML 分发给多人时，只要大家填同样的地址与密钥，就能共享同一套结果。
+      </div>
+      <pre class="sql" id="sqlText">create table if not exists public.service_assessments (
+  id text primary key,
+  created_at timestamptz not null default now(),
+  assessee text,
+  assessor text,
+  assessed_at text,
+  total numeric,
+  rate numeric,
+  payload jsonb
+);
+
+alter table public.service_assessments enable row level security;
+
+drop policy if exists "assess_anon_insert" on public.service_assessments;
+create policy "assess_anon_insert" on public.service_assessments
+  for insert to anon with check (true);
+
+drop policy if exists "assess_anon_select" on public.service_assessments;
+create policy "assess_anon_select" on public.service_assessments
+  for select to anon using (true);
+
+drop policy if exists "assess_anon_update" on public.service_assessments;
+create policy "assess_anon_update" on public.service_assessments
+  for update to anon using (true) with check (true);</pre>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h2>本机数据</h2><span class="hint" id="lsState">—</span></div>
+      <div class="btn-row">
+        <button class="btn" id="btnDlAll">导出全部记录 JSON</button>
+        <button class="btn danger" id="btnClearAll">清空本机全部记录</button>
+      </div>
+      <div class="small muted" style="margin-top:8px">
+        数据保存在浏览器 localStorage（file:// 打开时亦然）。清理浏览器数据会丢失，请定期导出 JSON 备份。
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="fillbar" id="fillbar">
+  <div class="fb">总分 <b class="acc" id="barTotal">0</b><span>/ 100</span></div>
+  <div class="fb">得分率 <b id="barRate">0%</b></div>
+  <div class="fb">已评 <b id="barRated">0</b><span>/ 26</span></div>
+  <div class="fb">已写原因 <b id="barReason">0</b><span>/ 26</span></div>
+  <div class="pbar"><span id="barFill"></span></div>
+  <div class="grow"></div>
+  <button class="btn primary sm" id="btnSubmit2">提交</button>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+  var DATA = {"title":"服务流程评估标准","source":"服务流程评估表 .xlsx","maxTotal":100,"steps":[{"step":"1. 准备","items":[{"item":"1.1 店铺环境检查","full":2,"grades":[{"level":"不合格","score":0,"behavior":"完全忽视店铺环境检查。"},{"level":"合格","score":1,"behavior":"部分完成环境检查，但部分有遗漏。"},{"level":"优秀","score":2,"behavior":"基本能独立完成所有环境检查项目。"}]},{"item":"1.2 个人准备检查","full":2,"grades":[{"level":"不合格","score":0,"behavior":"个人仪容仪表严重不符合要求。"},{"level":"合格","score":1,"behavior":"仪容仪表基本能达到公司要求，但状态还不够饱满。"},{"level":"优秀","score":2,"behavior":"仪容仪表精致，始终保持微笑、积极的状态接待顾客 。"}]},{"item":"1.3 参加团队会议","full":2,"grades":[{"level":"不合格","score":0,"behavior":"不参与或严重消极对待团队会议。"},{"level":"合格","score":1,"behavior":"参与团队会议，但会议交待事宜还需进一步跟进。"},{"level":"优秀","score":2,"behavior":"积极参与团队会议。"}]}]},{"step":"2. 待客之道","items":[{"item":"2.1 迎宾","full":2,"grades":[{"level":"不合格","score":0,"behavior":"完全忽视迎宾。"},{"level":"合格","score":1,"behavior":"基本完成迎宾，但缺乏热情。"},{"level":"优秀","score":2,"behavior":"及时热情地完成迎宾。"}]},{"item":"2.2 店内关怀","full":2,"grades":[{"level":"不合格","score":0,"behavior":"完全忽视顾客需求。"},{"level":"合格","score":1,"behavior":"基本能在顾客要求下，回应顾客非购物需求。"},{"level":"优秀","score":2,"behavior":"能主动关注并满足顾客各种非购物需求。"}]},{"item":"2.3 团队配合","full":2,"grades":[{"level":"不合格","score":0,"behavior":"完全没有团队意识。"},{"level":"合格","score":1,"behavior":"在店长协调下，配合团队工作"},{"level":"优秀","score":2,"behavior":"积极主动配合团队。"}]},{"item":"2.4 温馨送别","full":2,"grades":[{"level":"不合格","score":0,"behavior":"完全忽视离店顾客， 未进行任何形式的道别"},{"level":"合格","score":1,"behavior":"有送至门口并说送别语，但缺乏热情"},{"level":"优秀","score":2,"behavior":"无论是否购买，都能热情有礼地完成整个送别流程"}]}]},{"step":"3. 建立联系","items":[{"item":"3.1 自我介绍","full":4,"grades":[{"level":"不合格","score":0,"behavior":"完全没有自我介绍"},{"level":"合格","score":2,"behavior":"有自我介绍，但比较生硬"},{"level":"优秀","score":4,"behavior":"能很自然的进行自我介绍，顾客有较好的反应"}]},{"item":"3.2 三句话介绍门店","full":4,"grades":[{"level":"不合格","score":0,"behavior":"完全没有介绍"},{"level":"合格","score":2,"behavior":"有介绍，但比较生硬"},{"level":"优秀","score":4,"behavior":"能用有吸引力的语言介绍，引发顾客兴趣"}]},{"item":"3.3 询问顾客称呼","full":4,"grades":[{"level":"不合格","score":0,"behavior":"完全没有询问顾客称呼"},{"level":"合格","score":2,"behavior":"有介绍，但比较生硬，顾客大多数不愿意告知称呼"},{"level":"优秀","score":4,"behavior":"能很自然的询问顾客称呼，顾客大多数时候愿意告知"}]},{"item":"3.4 “三个基本问题”进入需求沟通","full":6,"grades":[{"level":"不合格","score":0,"behavior":"完全无法开启有效对话。"},{"level":"合格","score":3,"behavior":"能主动破冰，技巧还不够熟练。"},{"level":"优秀","score":6,"behavior":"能运用沟通技巧， 了解到顾客“目标”“场景”“偏好”"}]}]},{"step":"4. 发掘线索","items":[{"item":"4.1 观察和聆听","full":6,"grades":[{"level":"不合格","score":0,"behavior":"完全忽视顾客行为和需求线索。"},{"level":"合格","score":3,"behavior":"能注意到明显的需求线索，但常有遗漏。"},{"level":"优秀","score":6,"behavior":"善于观察，捕捉多数需求线索。"}]},{"item":"4.2  有效提问了解需求","full":6,"grades":[{"level":"不合格","score":0,"behavior":"没有主动提问，了解更多信息"},{"level":"合格","score":3,"behavior":"有主动提问，但沟通技巧不够经常未能获得顾客回应，或者对于顾客回应的信息未能精准把握，做出正确判断"},{"level":"优秀","score":6,"behavior":"能采用有效的提问技巧，探索个性化需求"}]},{"item":"4.3  沟通交流","full":6,"grades":[{"level":"不合格","score":0,"behavior":"没有主动与顾客沟通，基本被动问答状态"},{"level":"合格","score":3,"behavior":"能与顾客沟通交流，但面对不同类型顾客时还不能灵活变换沟通方式"},{"level":"优秀","score":6,"behavior":"与不同类型顾客沟通，都能亲切自然，能像朋友一样聊天并获得顾客信任"}]}]},{"step":"5. 展示体验","items":[{"item":"5.1 个性化推荐","full":4,"grades":[{"level":"不合格","score":0,"behavior":"完全不能根据顾客需求，主动推荐合适的产品"},{"level":"合格","score":2,"behavior":"能有意识的根据顾客需求推荐产品"},{"level":"优秀","score":4,"behavior":"能根据顾客需求推荐合适产品，顾客经常表示满意"}]},{"item":"5.2 为顾客操作演示","full":4,"grades":[{"level":"不合格","score":0,"behavior":"只是讲解产品，未能为顾客操作演示"},{"level":"合格","score":2,"behavior":"能为顾客演示产品，但操作还不够熟练，或忽略了部分细节"},{"level":"优秀","score":4,"behavior":"能熟练流利的为顾客演示产品功能，并能充分把握展示细节"}]},{"item":"5.3 邀请顾客体验","full":4,"grades":[{"level":"不合格","score":0,"behavior":"未邀请顾客上手体验"},{"level":"合格","score":2,"behavior":"有邀请顾客体验，但部分细节未能较好把握"},{"level":"优秀","score":4,"behavior":"能用自然舒适的方式吸引顾客体验，并有较好互动"}]},{"item":"5.4 分享情景故事","full":6,"grades":[{"level":"不合格","score":0,"behavior":"未能分享情景故事"},{"level":"合格","score":3,"behavior":"能分享情景故事，但讲解不够流利或者分享的情景未能符合顾客需求"},{"level":"优秀","score":6,"behavior":"能结合品牌故事和理念以及跟顾客需求结合，生动的讲解情景故事"}]},{"item":"5.5 产品功能分享","full":6,"grades":[{"level":"不合格","score":0,"behavior":"完全没有讲解或产品功能讲解错误"},{"level":"合格","score":3,"behavior":"能准确讲解产品功能，语言表达还不够流利生动"},{"level":"优秀","score":6,"behavior":"能用生活化的语言准确生动的讲解产品功能"}]},{"item":"5.6 推荐“增值服务”","full":4,"grades":[{"level":"不合格","score":0,"behavior":"完全没有推荐相关业务（配件礼包，回收，碎屏险等）"},{"level":"合格","score":2,"behavior":"有推荐，但介绍不够主动，或时机把握不佳，未能引发顾客兴趣"},{"level":"优秀","score":4,"behavior":"有分享介绍生动，能引发顾客兴趣，最终有成交。"}]},{"item":"5.7 引导顾客看其他相关产品","full":4,"grades":[{"level":"不合格","score":0,"behavior":"当顾客确定购买意向后，完全没有引导顾客看其他相关产品"},{"level":"合格","score":2,"behavior":"有建议，但正确时机把握和话术还不够熟练"},{"level":"优秀","score":4,"behavior":"能在正确时机和运用正确话术对顾客进行建议，提供良好体验"}]}]},{"step":"6. 达成交易","items":[{"item":"6.1 影响购买决策","full":6,"grades":[{"level":"不合格","score":0,"behavior":"完全不尝试影响顾客决策，或对顾客的购买信号没有反应。"},{"level":"合格","score":4,"behavior":"能采取促成成交的策略，但技巧性还不够熟练。"},{"level":"优秀","score":6,"behavior":"能准确把握有效购买时机，灵活运用多种策略，快速帮顾客做出购买决定。"}]},{"item":"6.2 排除疑虑","full":4,"grades":[{"level":"不合格","score":0,"behavior":"面对顾客的异议无法正确解答"},{"level":"合格","score":2,"behavior":"能用标准话术回答顾客疑虑，但应用还不够灵活"},{"level":"优秀","score":4,"behavior":"能灵活所学知识，流利自信的回答顾客疑虑"}]},{"item":"6.3 购买的顾客验机付款","full":4,"grades":[{"level":"不合格","score":0,"behavior":"无法独立完成拆封、联网和激活"},{"level":"合格","score":2,"behavior":"能独立完成验机付款流程，过程欠缺熟练，或者在等待期间无法监顾其他顾客"},{"level":"优秀","score":4,"behavior":"能独立完成验机付款流程，清晰介绍三包政策，并优化等待时间"}]},{"item":"6.4 未购买的顾客","full":2,"grades":[{"level":"不合格","score":0,"behavior":"对未购买顾客表现失望或冷淡。"},{"level":"合格","score":1,"behavior":"基本保持礼貌，能完成送别"},{"level":"优秀","score":2,"behavior":"无论是否购买，都能热情有礼地完成整个送别流程"}]}]},{"step":"7. 建立长远关系","items":[{"item":"7.1 主动添加顾客微信","full":2,"grades":[{"level":"不合格","score":0,"behavior":"不能主动添加顾客微信或邀请加入会员"},{"level":"合格","score":1,"behavior":"主动添加顾客微信并邀请加入会员，但技巧还不够熟练或当顾客拒绝后没有进一步沟通"},{"level":"优秀","score":2,"behavior":"能运用良好的沟通技巧，大部分顾客都能给予正向回应"}]}]}]};
+  var LS_KEY = "peez_service_assess_v1";
+  var ITEMS = [], STEPS = [], MAX_TOTAL = 0, BY_KEY = {};
+
+  /* ---------------- 工具函数 ---------------- */
+  function $(s, r) { return (r || document).querySelector(s); }
+  function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function nowLocal() {
+    var d = new Date();
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes());
+  }
+  function fmtLocal(v) {
+    if (!v) return "—";
+    return String(v).replace("T", " ").slice(0, 16);
+  }
+  function fmtISO(v) {
+    if (!v) return "—";
+    var d = new Date(v);
+    if (isNaN(d.getTime())) return String(v);
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+  }
+  function stamp() {
+    var d = new Date();
+    return "" + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "_" + pad(d.getHours()) + pad(d.getMinutes());
+  }
+  function uuid() {
+    try { if (window.crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) {}
+    return "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+  }
+  var toastTimer = null;
+  function toast(msg) {
+    var t = $("#toast");
+    t.textContent = msg;
+    t.classList.add("on");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove("on"); }, 2400);
+  }
+  function download(text, name, mime) {
+    var blob = new Blob([text], { type: mime || "application/octet-stream" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1200);
+  }
+  function b64enc(bytes) {
+    var bin = "", i;
+    for (i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin);
+  }
+  function b64dec(str) {
+    var s = str.replace(/\s+/g, "").replace(/-/g, "+").replace(/_/g, "/");
+    while (s.length % 4) s += "=";
+    var bin = atob(s), bytes = new Uint8Array(bin.length), i;
+    for (i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+
+  /* ---------------- 数据展开 ---------------- */
+  (function flatten() {
+    DATA.steps.forEach(function (st, si) {
+      var step = { name: String(st.step).trim(), full: 0, items: [], si: si };
+      st.items.forEach(function (it, ii) {
+        var key = "s" + si + "i" + ii;
+        var grades = it.grades.map(function (g) {
+          return { level: g.level, score: Number(g.score), behavior: g.behavior };
+        });
+        var item = {
+          key: key, name: it.item, full: Number(it.full),
+          grades: grades, si: si, stepName: step.name
+        };
+        step.items.push(item);
+        step.full += item.full;
+        BY_KEY[key] = item;
+        ITEMS.push(item);
+      });
+      STEPS.push(step);
+    });
+    MAX_TOTAL = STEPS.reduce(function (a, s) { return a + s.full; }, 0);
+  })();
+
+  /* ---------------- 状态 ---------------- */
+  var state = {
+    records: [],
+    settings: { url: "", key: "", table: "service_assessments", auto: "1" },
+    draft: null,
+    activeId: null,
+    view: "fill"
+  };
+  var draft = { assessee: "", assessor: "", assessedAt: nowLocal(), scores: {} };
+
+  function persist() {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify({
+        records: state.records, settings: state.settings, draft: state.draft
+      }));
+    } catch (e) {
+      toast("本地保存失败：" + e.message);
+    }
+    updateLsState();
+  }
+  function restore() {
+    try {
+      var raw = localStorage.getItem(LS_KEY);
+      if (!raw) return false;
+      var o = JSON.parse(raw);
+      if (o.records && o.records.length !== undefined) state.records = o.records;
+      if (o.settings) {
+        state.settings.url = o.settings.url || "";
+        state.settings.key = o.settings.key || "";
+        state.settings.table = o.settings.table || "service_assessments";
+        state.settings.auto = o.settings.auto == null ? "1" : String(o.settings.auto);
+      }
+      if (o.draft && o.draft.scores) {
+        draft.assessee = o.draft.assessee || "";
+        draft.assessor = o.draft.assessor || "";
+        draft.assessedAt = o.draft.assessedAt || nowLocal();
+        draft.scores = o.draft.scores || {};
+      }
+      return true;
+    } catch (e) { return false; }
+  }
+  function updateLsState() {
+    var el = $("#lsState");
+    if (el) el.textContent = "本机共 " + state.records.length + " 条记录";
+  }
+
+  /* ---------------- 视图切换 ---------------- */
+  function switchView(v) {
+    state.view = v;
+    ["fill", "result", "share", "settings"].forEach(function (k) {
+      var sec = $("#view-" + k);
+      if (sec) sec.classList.toggle("hidden", k !== v);
+    });
+    $$(".tab").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-view") === v); });
+    $("#fillbar").classList.toggle("hidden", v !== "fill");
+    if (v === "result") renderResult();
+    if (v === "share") renderShare();
+    if (v === "settings") renderSettings();
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------------- 填写页 ---------------- */
+  function renderForm() {
+    var html = "";
+    STEPS.forEach(function (step, si) {
+      html += '<div class="step" data-si="' + si + '">';
+      html += '<div class="step-h"><span class="idx">' + (si + 1) + '</span><h3>' + esc(step.name) +
+              '</h3><span class="step-sum">小计 <b data-step-sum="' + si + '">0</b> / ' + step.full + ' 分</span></div>';
+      step.items.forEach(function (it) {
+        html += '<div class="item" id="item-' + it.key + '" data-key="' + it.key + '">';
+        html += '<div class="item-h"><span class="t">' + esc(it.name) + '</span>' +
+                '<span class="badge">满分 ' + it.full + ' 分</span></div>';
+        html += '<div class="opts">';
+        it.grades.forEach(function (g) {
+          html += '<button type="button" class="opt" data-key="' + it.key + '" data-level="' + esc(g.level) +
+                  '" data-score="' + g.score + '">' + esc(g.level) + '<i>' + g.score + ' 分</i></button>';
+        });
+        html += '</div>';
+        html += '<div class="beh" data-beh="' + it.key + '"></div>';
+        html += '<div class="reason-l"><span>打分原因 <span class="req">* 必填</span></span>' +
+                '<span data-rlen="' + it.key + '"></span></div>';
+        html += '<textarea class="rt" data-key="' + it.key + '" rows="2" placeholder="请写明打分依据，如具体行为、发生场景、顾客反应等"></textarea>';
+        html += '</div>';
+      });
+      html += '</div>';
+    });
+    $("#formRoot").innerHTML = html;
+    restoreDraftToForm();
+    updateStats();
+  }
+
+  function restoreDraftToForm() {
+    $("#inAssessee").value = draft.assessee || "";
+    $("#inAssessor").value = draft.assessor || "";
+    $("#inTime").value = draft.assessedAt || nowLocal();
+    Object.keys(draft.scores || {}).forEach(function (k) {
+      var a = draft.scores[k] || {};
+      var item = BY_KEY[k];
+      if (!item) return;
+      if (a.level) {
+        var btn = $('.opt[data-key="' + k + '"][data-level="' + a.level + '"]');
+        if (btn) btn.classList.add("sel");
+        var beh = $('[data-beh="' + k + '"]');
+        var g = item.grades.filter(function (x) { return x.level === a.level; })[0];
+        if (beh && g) { beh.textContent = "参考行为：" + g.behavior; beh.classList.add("on"); }
+      }
+      if (a.reason) {
+        var ta = $('textarea[data-key="' + k + '"]');
+        if (ta) ta.value = a.reason;
+      }
+    });
+  }
+
+  function pick(key, level) {
+    var item = BY_KEY[key];
+    if (!item) return;
+    var g = item.grades.filter(function (x) { return x.level === level; })[0];
+    if (!g) return;
+    var a = draft.scores[key] || {};
+    a.level = level; a.score = g.score;
+    draft.scores[key] = a;
+    var box = $('#item-' + key);
+    $$(".opt", box).forEach(function (b) { b.classList.toggle("sel", b.getAttribute("data-level") === level); });
+    var beh = $('[data-beh="' + key + '"]');
+    beh.textContent = "参考行为：" + g.behavior;
+    beh.classList.add("on");
+    box.classList.remove("invalid");
+    updateStats();
+    persist();
+  }
+
+  function setReason(key, val) {
+    var a = draft.scores[key] || {};
+    a.reason = val;
+    draft.scores[key] = a;
+    var box = $('#item-' + key);
+    if (val.trim()) {
+      $("textarea", box).classList.remove("invalid");
+      if (a.level) box.classList.remove("invalid");
+    }
+    $("[data-rlen='" + key + "']").textContent = val.trim() ? val.trim().length + " 字" : "";
+    updateStats();
+    persist();
+  }
+
+  function calc() {
+    var total = 0, rated = 0, reasoned = 0, per = {};
+    STEPS.forEach(function (s) { per[s.si] = 0; });
+    ITEMS.forEach(function (it) {
+      var a = (draft.scores || {})[it.key] || {};
+      if (a.level) { rated++; total += Number(a.score) || 0; per[it.si] += Number(a.score) || 0; }
+      if (a.reason && String(a.reason).trim()) reasoned++;
+    });
+    return { total: total, rated: rated, reasoned: reasoned, per: per };
+  }
+
+  function updateStats() {
+    var c = calc();
+    var rate = MAX_TOTAL ? (c.total / MAX_TOTAL * 100) : 0;
+    $("#barTotal").textContent = c.total;
+    $("#barRate").textContent = (Math.round(rate * 10) / 10) + "%";
+    $("#barRated").textContent = c.rated;
+    $("#barReason").textContent = c.reasoned;
+    $("#barFill").style.width = Math.max(0, Math.min(100, rate)) + "%";
+    STEPS.forEach(function (s) {
+      var el = $('[data-step-sum="' + s.si + '"]');
+      if (el) el.textContent = c.per[s.si];
+    });
+  }
+
+  $("#formRoot").addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest(".opt") : null;
+    if (b) pick(b.getAttribute("data-key"), b.getAttribute("data-level"));
+  });
+  $("#formRoot").addEventListener("input", function (e) {
+    var t = e.target;
+    if (t && t.tagName === "TEXTAREA" && t.getAttribute("data-key")) {
+      setReason(t.getAttribute("data-key"), t.value);
+    }
+  });
+  ["inAssessee", "inAssessor", "inTime"].forEach(function (id) {
+    $("#" + id).addEventListener("input", function () {
+      draft.assessee = $("#inAssessee").value;
+      draft.assessor = $("#inAssessor").value;
+      draft.assessedAt = $("#inTime").value;
+      $("#f-" + (id === "inAssessee" ? "assessee" : id === "inAssessor" ? "assessor" : "time")).classList.remove("err");
+      persist();
+    });
+  });
+
+  /* ---------------- 提交 ---------------- */
+  function validate() {
+    var missScore = [], missReason = [];
+    ITEMS.forEach(function (it) {
+      var a = (draft.scores || {})[it.key] || {};
+      if (!a.level) missScore.push(it);
+      else if (!a.reason || !String(a.reason).trim()) missReason.push(it);
+      if (!a.level && a.reason && String(a.reason).trim()) { /* 有原因无评分，仍算缺评分 */ }
+    });
+    ITEMS.forEach(function (it) {
+      var a = (draft.scores || {})[it.key] || {};
+      if (a.level && (!a.reason || !String(a.reason).trim()) && missReason.indexOf(it) < 0) missReason.push(it);
+    });
+
+    var metaErr = [];
+    if (!$("#inAssessee").value.trim()) { metaErr.push("被评估人姓名"); $("#f-assessee").classList.add("err"); }
+    else $("#f-assessee").classList.remove("err");
+    if (!$("#inAssessor").value.trim()) { metaErr.push("评估人姓名"); $("#f-assessor").classList.add("err"); }
+    else $("#f-assessor").classList.remove("err");
+    if (!$("#inTime").value) { metaErr.push("评估时间"); $("#f-time").classList.add("err"); }
+    else $("#f-time").classList.remove("err");
+
+    ITEMS.forEach(function (it) {
+      var box = $('#item-' + it.key);
+      var a = (draft.scores || {})[it.key] || {};
+      var bad = !a.level || !a.reason || !String(a.reason).trim();
+      box.classList.toggle("invalid", bad);
+      var ta = $("textarea", box);
+      if (ta) ta.classList.toggle("invalid", !!(a.level && (!a.reason || !String(a.reason).trim())));
+    });
+    return { missScore: missScore, missReason: missReason, metaErr: metaErr };
+  }
+
+  function submit() {
+    var v = validate();
+    var msg = [];
+    if (v.metaErr.length) msg.push("请填写：" + v.metaErr.join("、"));
+    if (v.missScore.length) msg.push(v.missScore.length + " 项未选择评分");
+    if (v.missReason.length) msg.push(v.missReason.length + " 项未填写打分原因");
+
+    if (msg.length) {
+      $("#formMsg").innerHTML =
+        '<div class="card" style="border-color:#e0c0bc;background:#fdf6f5;margin-bottom:14px">' +
+        '<div style="font-size:13px;color:#8e3f38;font-weight:600;margin-bottom:4px">还有内容未完成，暂不能提交</div>' +
+        '<div class="small" style="color:#8e3f38">' + msg.join("；") + '。已用红色标记缺失的项。</div></div>';
+      var first = v.missScore[0] || v.missReason[0];
+      if (first) {
+        var box = $('#item-' + first.key);
+        if (box) box.scrollIntoView({ behavior: "smooth", block: "center" });
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      toast("请补全未完成的项");
+      return;
+    }
+    $("#formMsg").innerHTML = "";
+
+    var scores = {};
+    ITEMS.forEach(function (it) {
+      var a = draft.scores[it.key];
+      scores[it.key] = { level: a.level, score: Number(a.score), reason: String(a.reason).trim() };
+    });
+    var c = calc();
+    var rate = Math.round((c.total / MAX_TOTAL * 100) * 10) / 10;
+    var rec = {
+      id: uuid(),
+      assessee: $("#inAssessee").value.trim(),
+      assessor: $("#inAssessor").value.trim(),
+      assessedAt: $("#inTime").value,
+      createdAt: new Date().toISOString(),
+      total: c.total,
+      rate: rate,
+      scores: scores,
+      synced: false
+    };
+    state.records.unshift(rec);
+    state.activeId = rec.id;
+    draft = { assessee: "", assessor: rec.assessor, assessedAt: nowLocal(), scores: {} };
+    state.draft = draft;
+    persist();
+    renderForm();
+    switchView("result");
+    toast("已提交：" + rec.assessee + " 总分 " + rec.total + " 分");
+
+    if (state.settings.url && state.settings.key && state.settings.auto === "1") {
+      sbUpload(rec).then(function () { toast("已同步至云端"); })
+        .catch(function (e) { toast("云端同步失败：" + e.message); });
+    }
+  }
+
+  $("#btnSubmit").addEventListener("click", submit);
+  $("#btnSubmit2").addEventListener("click", submit);
+  $("#btnReset").addEventListener("click", function () {
+    if (!confirm("确认清空当前正在填写的内容？（已提交的记录不受影响）")) return;
+    draft = { assessee: "", assessor: draft.assessor || "", assessedAt: nowLocal(), scores: {} };
+    state.draft = draft;
+    persist();
+    renderForm();
+    $("#formMsg").innerHTML = "";
+    toast("已清空，重新开始");
+  });
+
+  /* ---------------- 结果页 ---------------- */
+  function stepScores(rec) {
+    var per = {};
+    STEPS.forEach(function (s) { per[s.si] = 0; });
+    ITEMS.forEach(function (it) {
+      var a = (rec.scores || {})[it.key];
+      if (a && a.level) per[it.si] += Number(a.score) || 0;
+    });
+    return per;
+  }
+
+  function renderResult() {
+    var body = $("#resultBody");
+    if (!state.records.length) {
+      body.innerHTML =
+        '<div class="card"><div class="empty"><b>还没有任何评估记录</b>' +
+        '在「填写评估」页完成 26 个环节的打分后提交，或到「数据共享」页导入他人发来的结果码 / JSON 文件。</div></div>';
+      return;
+    }
+    if (!state.activeId || !state.records.some(function (r) { return r.id === state.activeId; })) {
+      state.activeId = state.records[0].id;
+    }
+    var rec = state.records.filter(function (r) { return r.id === state.activeId; })[0];
+    var per = stepScores(rec);
+    var html = '<div class="result-grid">';
+
+    /* 左：记录列表 */
+    html += '<div class="card rec-list"><div class="rl-h"><span>评估记录</span><span>' + state.records.length + ' 条</span></div>';
+    state.records.forEach(function (r) {
+      html += '<button class="rec' + (r.id === rec.id ? " active" : "") + '" data-rid="' + r.id + '">' +
+        '<div class="r1"><span>' + esc(r.assessee || "未命名") + '</span><span>' + r.total + '</span></div>' +
+        '<div class="r2">评估人 ' + esc(r.assessor || "—") + ' · ' + fmtLocal(r.assessedAt) + '</div></button>';
+    });
+    html += '</div>';
+
+    /* 右：详情 */
+    html += '<div>';
+    html += '<div class="card">';
+    html += '<div class="card-h"><h2>' + esc(rec.assessee || "未命名") + ' 的评估结果</h2>' +
+      '<span class="hint">评估人 ' + esc(rec.assessor || "—") + ' · 评估时间 ' + fmtLocal(rec.assessedAt) + '</span></div>';
+    html += '<div class="kpis">' +
+      '<div class="kpi"><div class="k">总分</div><div class="v">' + rec.total + '<small>/ ' + MAX_TOTAL + ' 分</small></div></div>' +
+      '<div class="kpi"><div class="k">得分率</div><div class="v">' + (rec.rate != null ? rec.rate : Math.round(rec.total / MAX_TOTAL * 1000) / 10) + '<small>%</small></div></div>' +
+      '<div class="kpi"><div class="k">评估环节</div><div class="v">' + ITEMS.length + '<small>项</small></div></div>' +
+      '<div class="kpi"><div class="k">提交时间</div><div class="v" style="font-size:13px;line-height:1.5;font-weight:500;margin-top:6px">' + fmtISO(rec.createdAt) + '</div></div>' +
+      '</div>';
+
+    html += '<h3 style="font-size:13px;margin:4px 0 10px">各步骤得分</h3>';
+    STEPS.forEach(function (s) {
+      var got = per[s.si] || 0;
+      var pct = s.full ? Math.round(got / s.full * 1000) / 10 : 0;
+      html += '<div class="bar-row"><div class="bl" title="' + esc(s.name) + '">' + esc(s.name) + '</div>' +
+        '<div class="bar"><span style="width:' + Math.max(0, Math.min(100, pct)) + '%"></span></div>' +
+        '<div class="bar-val">' + got + ' / ' + s.full + ' 分</div></div>';
+    });
+
+    html += '<div class="table-wrap" style="margin-top:14px"><table><thead><tr>' +
+      '<th>步骤</th><th>环节</th><th>等级</th><th class="num">得分</th><th class="num">满分</th>' +
+      '</tr></thead><tbody>';
+    ITEMS.forEach(function (it) {
+      var a = (rec.scores || {})[it.key] || {};
+      html += '<tr><td>' + esc(it.stepName) + '</td><td>' + esc(it.name) + '</td>' +
+        '<td><span class="chip chip-' + (a.level || "未评") + '">' + esc(a.level || "未评") + '</span></td>' +
+        '<td class="num sc">' + (a.level ? a.score : "—") + '</td><td class="num">' + it.full + '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+
+    html += '<div class="btn-row" style="margin-top:14px">' +
+      '<button class="btn" id="btnCsvOne">导出本条 CSV</button>' +
+      '<button class="btn" id="btnCsvAll">导出全部 CSV</button>' +
+      '<button class="btn" id="btnShareOne">生成结果码</button>' +
+      '<button class="btn danger" id="btnDelOne">删除本条</button>' +
+      '</div>';
+    html += '</div>';
+
+    /* 逐项明细 */
+    html += '<div class="card"><div class="card-h"><h2>逐项明细</h2><span class="hint">等级 / 得分 / 参考行为 / 打分原因</span></div>';
+    STEPS.forEach(function (s) {
+      var got = per[s.si] || 0;
+      html += '<details class="mi"><summary><span class="caret">▾</span>' + esc(s.name) +
+        '<span class="sum-r">' + got + ' / ' + s.full + ' 分</span></summary><div class="body"><div class="table-wrap"><table>' +
+        '<thead><tr><th>环节</th><th>等级</th><th class="num">得分</th><th>参考行为</th><th>打分原因</th></tr></thead><tbody>';
+      s.items.forEach(function (it) {
+        var a = (rec.scores || {})[it.key] || {};
+        var g = it.grades.filter(function (x) { return x.level === a.level; })[0];
+        html += '<tr><td>' + esc(it.name) + '</td>' +
+          '<td><span class="chip chip-' + (a.level || "未评") + '">' + esc(a.level || "未评") + '</span></td>' +
+          '<td class="num sc">' + (a.level ? a.score : "—") + ' / ' + it.full + '</td>' +
+          '<td class="muted" style="min-width:180px">' + esc(g ? g.behavior : "—") + '</td>' +
+          '<td style="min-width:180px">' + (a.reason ? esc(a.reason) : '<span class="muted">—</span>') + '</td></tr>';
+      });
+      html += '</tbody></table></div></div></details>';
+    });
+    html += '</div>';
+
+    html += '</div></div>';
+    body.innerHTML = html;
+
+    $$(".rec", body).forEach(function (b) {
+      b.addEventListener("click", function () {
+        state.activeId = b.getAttribute("data-rid");
+        renderResult();
+      });
+    });
+    $("#btnCsvOne").addEventListener("click", function () { exportCSV([rec], "服务流程评估_" + (rec.assessee || "未命名")); });
+    $("#btnCsvAll").addEventListener("click", function () { exportCSV(state.records, "服务流程评估_汇总"); });
+    $("#btnShareOne").addEventListener("click", function () {
+      state.shareTarget = rec.id;
+      switchView("share");
+      setTimeout(function () { $("#btnGenCode").click(); }, 30);
+    });
+    $("#btnDelOne").addEventListener("click", function () {
+      if (!confirm("确认删除「" + (rec.assessee || "未命名") + "」的这条评估记录？此操作不可恢复。")) return;
+      state.records = state.records.filter(function (r) { return r.id !== rec.id; });
+      state.activeId = state.records.length ? state.records[0].id : null;
+      persist(); renderResult(); toast("已删除该条记录");
+    });
+  }
+
+  /* ---------------- 记录归一化 ---------------- */
+  function normalizeRecord(r) {
+    if (!r || typeof r !== "object") return null;
+    var rec = {
+      id: r.id || uuid(),
+      assessee: String(r.assessee || "").trim(),
+      assessor: String(r.assessor || "").trim(),
+      assessedAt: r.assessedAt || nowLocal(),
+      createdAt: r.createdAt || new Date().toISOString(),
+      scores: {},
+      synced: !!r.synced
+    };
+    var raw = r.scores || {};
+    ITEMS.forEach(function (it) {
+      var a = raw[it.key];
+      if (!a || !a.level) return;
+      var g = it.grades.filter(function (x) { return x.level === a.level; })[0];
+      if (!g) return;
+      rec.scores[it.key] = { level: g.level, score: g.score, reason: String(a.reason == null ? "" : a.reason).trim() };
+    });
+    var c = stepScores(rec);
+    rec.total = Object.keys(c).reduce(function (s, k) { return s + c[k]; }, 0);
+    rec.rate = Math.round((rec.total / MAX_TOTAL * 100) * 10) / 10;
+    return rec;
+  }
+
+  function mergeRecords(list) {
+    var added = 0, updated = 0;
+    (list || []).forEach(function (r) {
+      var rec = normalizeRecord(r);
+      if (!rec) return;
+      if (!Object.keys(rec.scores).length) return;
+      var idx = -1;
+      state.records.forEach(function (x, i) {
+        if (x.id === rec.id) idx = i;
+        else if (!idx && x.assessee === rec.assessee && x.assessor === rec.assessor && x.createdAt === rec.createdAt) idx = i;
+      });
+      if (idx >= 0) { state.records[idx] = rec; updated++; }
+      else { state.records.unshift(rec); added++; }
+    });
+    state.records.sort(function (a, b) { return String(b.createdAt).localeCompare(String(a.createdAt)); });
+    persist();
+    renderResult();
+    return { added: added, updated: updated };
+  }
+
+  /* ---------------- CSV ---------------- */
+  function exportCSV(recs, prefix) {
+    var head = ["被评估人", "评估人", "评估时间", "提交时间", "步骤", "环节", "等级", "得分", "满分", "参考行为", "打分原因", "记录总分", "得分率"];
+    var rows = [head];
+    (recs || []).forEach(function (r) {
+      ITEMS.forEach(function (it) {
+        var a = (r.scores || {})[it.key] || {};
+        var g = it.grades.filter(function (x) { return x.level === a.level; })[0];
+        rows.push([
+          r.assessee, r.assessor, fmtLocal(r.assessedAt), fmtISO(r.createdAt), it.stepName, it.name,
+          a.level || "", a.level ? a.score : "", it.full, g ? g.behavior : "",
+          String(a.reason || "").replace(/\r?\n/g, " "), r.total, (r.rate == null ? "" : r.rate + "%")
+        ]);
+      });
+    });
+    var csv = "\ufeff" + rows.map(function (row) {
+      return row.map(function (v) {
+        var s = String(v == null ? "" : v);
+        return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+      }).join(",");
+    }).join("\r\n");
+    download(csv, (prefix || "服务流程评估") + "_" + stamp() + ".csv", "text/csv;charset=utf-8");
+    toast("已导出 CSV（可用 Excel 打开）");
+  }
+
+  /* ---------------- 结果码 ---------------- */
+  function payloadOf(recs) {
+    return {
+      v: 1, app: "服务流程评估问卷",
+      records: recs.map(function (r) {
+        return {
+          id: r.id, assessee: r.assessee, assessor: r.assessor,
+          assessedAt: r.assessedAt, createdAt: r.createdAt,
+          total: r.total, rate: r.rate, scores: r.scores
+        };
+      })
+    };
+  }
+
+  function encodeCode(obj) {
+    var json = JSON.stringify(obj);
+    var bytes = new TextEncoder().encode(json);
+    if (window.CompressionStream) {
+      return new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream("gzip")))
+        .arrayBuffer()
+        .then(function (buf) { return "PEEZ1Z:" + b64enc(new Uint8Array(buf)); })
+        .catch(function () { return "PEEZ1J:" + b64enc(bytes); });
+    }
+    return Promise.resolve("PEEZ1J:" + b64enc(bytes));
+  }
+
+  function decodeCode(text) {
+    var t = String(text || "").replace(/\s+/g, "").replace(/^["']|["']$/g, "");
+    if (!t) return Promise.reject(new Error("结果码为空"));
+    var kind = "PEEZ1J", body = t;
+    if (t.indexOf("PEEZ1Z:") === 0) { kind = "PEEZ1Z"; body = t.slice(7); }
+    else if (t.indexOf("PEEZ1J:") === 0) { kind = "PEEZ1J"; body = t.slice(7); }
+    var bytes;
+    try { bytes = b64dec(body); } catch (e) { return Promise.reject(new Error("结果码内容无法解析，请确认已完整复制")); }
+    if (kind === "PEEZ1Z") {
+      if (!window.DecompressionStream) return Promise.reject(new Error("当前浏览器不支持解压该结果码，请改用 JSON 文件导入"));
+      return new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip")))
+        .text().then(function (s) { return JSON.parse(s); });
+    }
+    try { return Promise.resolve(JSON.parse(new TextDecoder().decode(bytes))); }
+    catch (e) { return Promise.reject(new Error("结果码内容不是有效的评估数据")); }
+  }
+
+  /* ---------------- 共享页 ---------------- */
+  function renderShare() {
+    var sel = $("#shareSel");
+    var opts = '<option value="all">全部记录（' + state.records.length + ' 条）</option>';
+    state.records.forEach(function (r) {
+      opts += '<option value="' + r.id + '">' + esc(r.assessee || "未命名") + ' · ' + r.total + ' 分 · ' + fmtLocal(r.assessedAt) + '</option>';
+    });
+    sel.innerHTML = opts;
+    if (state.shareTarget) {
+      sel.value = state.shareTarget;
+      state.shareTarget = null;
+    }
+  }
+
+  function currentShareRecords() {
+    var v = $("#shareSel").value;
+    if (v === "all") return state.records;
+    return state.records.filter(function (r) { return r.id === v; });
+  }
+
+  $("#btnGenCode").addEventListener("click", function () {
+    var recs = currentShareRecords();
+    if (!recs.length) { toast("暂无记录可导出"); return; }
+    encodeCode(payloadOf(recs)).then(function (code) {
+      $("#codeOut").value = code;
+      toast("结果码已生成（" + code.length + " 字符）");
+    }).catch(function (e) { toast("生成失败：" + e.message); });
+  });
+
+  $("#btnCopyCode").addEventListener("click", function () {
+    var ta = $("#codeOut");
+    if (!ta.value) { toast("请先生成结果码"); return; }
+    var done = function () { toast("结果码已复制"); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(ta.value).then(done, function () {
+        ta.select(); document.execCommand("copy"); done();
+      });
+    } else {
+      ta.select(); document.execCommand("copy"); done();
+    }
+  });
+
+  $("#btnDlJson").addEventListener("click", function () {
+    var recs = currentShareRecords();
+    if (!recs.length) { toast("暂无记录可导出"); return; }
+    download(JSON.stringify(payloadOf(recs), null, 2), "服务流程评估_" + stamp() + ".json", "application/json");
+    toast("已下载 JSON 文件");
+  });
+
+  $("#btnImportText").addEventListener("click", function () {
+    var txt = $("#importText").value.trim();
+    if (!txt) { toast("请先粘贴结果码"); return; }
+    decodeCode(txt).then(handlePayload).catch(function (e) { toast("导入失败：" + e.message); });
+  });
+
+  $("#btnPickFile").addEventListener("click", function () { $("#fileInput").click(); });
+  $("#fileInput").addEventListener("change", function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var txt = String(reader.result || "");
+      var obj = null;
+      try { obj = JSON.parse(txt); } catch (e) { obj = null; }
+      if (obj) { handlePayload(obj, f.name); return; }
+      decodeCode(txt).then(function (o) { handlePayload(o, f.name); })
+        .catch(function (err) { toast("文件解析失败：" + err.message); });
+    };
+    reader.readAsText(f, "utf-8");
+    this.value = "";
+  });
+
+  function handlePayload(obj, name) {
+    var list = obj && obj.records ? obj.records : (Array.isArray(obj) ? obj : (obj && obj.scores ? [obj] : null));
+    if (!list || !list.length) { toast("未找到可导入的评估记录"); return; }
+    var r = mergeRecords(list);
+    $("#importText").value = "";
+    toast("导入完成：新增 " + r.added + " 条，更新 " + r.updated + " 条");
+    state.activeId = state.records.length ? state.records[0].id : null;
+    switchView("result");
+    if (name) $("#codeOut").value = "";
+  }
+
+  /* ---------------- 设置 / Supabase ---------------- */
+  function renderSettings() {
+    $("#inSbUrl").value = state.settings.url || "";
+    $("#inSbKey").value = state.settings.key || "";
+    $("#inSbTable").value = state.settings.table || "service_assessments";
+    $("#inSbAuto").value = state.settings.auto === "0" ? "0" : "1";
+    $("#sbState").textContent = state.settings.url && state.settings.key ? "已配置云端" : "未配置云端（纯本地）";
+    updateLsState();
+  }
+
+  $("#btnSaveSettings").addEventListener("click", function () {
+    state.settings.url = $("#inSbUrl").value.trim().replace(/\/+$/, "");
+    state.settings.key = $("#inSbKey").value.trim();
+    state.settings.table = ($("#inSbTable").value.trim() || "service_assessments");
+    state.settings.auto = $("#inSbAuto").value;
+    persist(); renderSettings();
+    toast("设置已保存");
+  });
+
+  function sbBase() {
+    var url = state.settings.url.replace(/\/+$/, "");
+    var table = state.settings.table || "service_assessments";
+    if (!url) throw new Error("请先在设置中填写 Supabase URL");
+    if (!state.settings.key) throw new Error("请先在设置中填写 anon key");
+    return { endpoint: url + "/rest/v1/" + table, key: state.settings.key };
+  }
+
+  function sbUpload(rec) {
+    var b;
+    try { b = sbBase(); } catch (e) { return Promise.reject(e); }
+    var body = {
+      id: rec.id,
+      created_at: rec.createdAt,
+      assessee: rec.assessee,
+      assessor: rec.assessor,
+      assessed_at: rec.assessedAt,
+      total: rec.total,
+      rate: rec.rate,
+      payload: rec
+    };
+    return fetch(b.endpoint, {
+      method: "POST",
+      headers: {
+        "apikey": b.key,
+        "Authorization": "Bearer " + b.key,
+        "Content-Type": "application/json",
+        "Prefer": "resolution=merge-duplicates,return=minimal"
+      },
+      body: JSON.stringify(body)
+    }).then(function (res) {
+      if (!res.ok) return res.text().then(function (t) { throw new Error("HTTP " + res.status + " " + t.slice(0, 160)); });
+      rec.synced = true;
+      persist();
+      return true;
+    });
+  }
+
+  function sbPull() {
+    var b;
+    try { b = sbBase(); } catch (e) { return Promise.reject(e); }
+    return fetch(b.endpoint + "?select=*&order=created_at.desc&limit=1000", {
+      headers: { "apikey": b.key, "Authorization": "Bearer " + b.key }
+    }).then(function (res) {
+      if (!res.ok) return res.text().then(function (t) { throw new Error("HTTP " + res.status + " " + t.slice(0, 160)); });
+      return res.json();
+    }).then(function (rows) {
+      var list = (rows || []).map(function (r) { return r.payload || r; }).filter(Boolean);
+      if (!list.length) { toast("云端暂无记录"); return { added: 0, updated: 0 }; }
+      var r = mergeRecords(list);
+      toast("云端拉取完成：新增 " + r.added + " 条，更新 " + r.updated + " 条");
+      return r;
+    });
+  }
+
+  $("#btnTestSb").addEventListener("click", function () {
+    $("#btnSaveSettings").click();
+    var b;
+    try { b = sbBase(); } catch (e) { toast(e.message); return; }
+    $("#sbState").textContent = "连接中…";
+    fetch(b.endpoint + "?select=id&limit=1", { headers: { "apikey": b.key, "Authorization": "Bearer " + b.key } })
+      .then(function (res) {
+        if (res.ok) { $("#sbState").textContent = "连接成功"; toast("云端连接成功"); }
+        else return res.text().then(function (t) {
+          $("#sbState").textContent = "连接失败 HTTP " + res.status;
+          toast("连接失败：HTTP " + res.status + " " + t.slice(0, 100));
+        });
+      })
+      .catch(function (e) { $("#sbState").textContent = "连接失败"; toast("连接失败：" + e.message); });
+  });
+
+  $("#btnPullSb").addEventListener("click", function () {
+    $("#btnSaveSettings").click();
+    sbPull().catch(function (e) { toast("拉取失败：" + e.message); });
+  });
+
+  $("#btnDlAll").addEventListener("click", function () {
+    if (!state.records.length) { toast("暂无记录可导出"); return; }
+    download(JSON.stringify(payloadOf(state.records), null, 2), "服务流程评估_全部_" + stamp() + ".json", "application/json");
+  });
+
+  $("#btnClearAll").addEventListener("click", function () {
+    if (!state.records.length) { toast("本机暂无记录"); return; }
+    if (!confirm("将清空本机全部 " + state.records.length + " 条评估记录，且不可恢复。建议先导出 JSON 备份。确认继续？")) return;
+    state.records = []; state.activeId = null; persist(); renderResult(); toast("已清空本机记录");
+  });
+
+  /* ---------------- 启动 ---------------- */
+  $$(".tab").forEach(function (b) {
+    b.addEventListener("click", function () { switchView(b.getAttribute("data-view")); });
+  });
+
+  restore();
+  state.draft = draft;
+  renderForm();
+  $("#inTime").value = $("#inTime").value || nowLocal();
+  if (!state.records.length) renderResult();
+  switchView("fill");
+  updateLsState();
+  var sub = $("#brandSub");
+  if (sub) sub.textContent = ITEMS.length + " 个环节 · 满分 " + MAX_TOTAL + " 分";
+})();
+</script>
+</body>
+</html>
